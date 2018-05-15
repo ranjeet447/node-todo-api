@@ -3,11 +3,13 @@ require('./config/config');
 const express = require('express');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
+var {ObjectID} = require('mongodb')
+
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
-var {ObjectID} = require('mongodb')
+var {authenticate} = require('./middleware/authenticate');
 
 var app = express();
 app.use(bodyParser.json());
@@ -89,11 +91,7 @@ app.patch('/todos/:id',(req,res)=>{
 });
 
 app.post('/users',(req,res)=>{
-  // var body=_.pick(req.body,['email','password']);
-  var body = {
-    email:req.body.email,
-    password:req.body.password
-  }
+  var body=_.pick(req.body,['email','password']);
   var user = new User(body);
 
   user.save().then((user)=>{
@@ -105,6 +103,10 @@ app.post('/users',(req,res)=>{
   });
 });
 
+
+app.get('/user/me', authenticate ,function(req,res){
+  res.send(req.user)
+});
 
 
 
