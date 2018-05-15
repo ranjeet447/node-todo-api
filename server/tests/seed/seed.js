@@ -20,15 +20,21 @@ const users = [{
   _id : userTwoId,
   email:"asdfg@example.com",
   password:'password2',
+  tokens:[{
+    access:'auth',
+    token:jwt.sign({_id:userTwoId,access:'auth'},'saltSecret').toString()
+  }]
 }];
 
 const todos = [
   {
     _id:new ObjectID(),
-    text:'first todo'
+    text:'first todo',
+    _creator:userOneId
   },{
     _id:new ObjectID(),
-    text:'second todo'
+    text:'second todo',
+    _creator:userTwoId
   }
 ];
 
