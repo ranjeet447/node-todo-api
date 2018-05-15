@@ -4,23 +4,12 @@
 //
  const {app} = require('./../server');
  const {Todo} = require('./../models/todo');
+ const {todos,populateTodos,users,populateUsers} = require('./seed/seed')
 
- const todos = [
-   {
-     _id:new ObjectID(),
-     text:'first todo'
-   },{
-     _id:new ObjectID(),
-     text:'second todo'
-   }
- ]
 
-beforeEach((done) => {
-  Todo.remove({}).then(() =>{
-    return Todo.insertMany(todos);
-  }).then(()=> done());
-});
 
+beforeEach(populateTodos);
+beforeEach(populateUsers);
 // test('sample test',()=>{
 //   expect(2).toBe(2);
 // })
