@@ -2,11 +2,11 @@ require('./config/config');
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const _ = require('underscore');
+const _ = require('lodash');
 
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
-var {user} = require('./models/user');
+var {User} = require('./models/user');
 var {ObjectID} = require('mongodb')
 
 var app = express();
@@ -86,6 +86,23 @@ app.patch('/todos/:id',(req,res)=>{
   }).catch((e)=>{
     res.status(400).send();
   })
+});
+
+app.post('/users',(req,res)=>{
+  // var body=_.pick(req.body,['email','password']);
+  var body = {
+    email:req.body.email,
+    password:req.body.password
+  }
+  var user = new User(body);
+
+  user.save().then((user)=>{
+    return user.generateAuthToken();
+  }).then((token)=>{
+    res.header('x-auth',token).send(user);
+  }).catch((e)=>{
+    res.status(400).send(e);
+  });
 });
 
 
