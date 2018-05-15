@@ -90,3 +90,57 @@ describe('GET /todo/:id',()=>{
         .end(done);
     });
 });
+
+describe('DELETE /todo/:id',()=>{
+  test('should delete todo by id',(done)=>{
+    var hexId = todos[1]._id.toHexString();
+    request(app)
+      .delete(`/todos/${hexId}`)
+      .expect(200)
+      .expect((res)=>{
+        expect(res.body.todo._id).toBe(hexId);
+      }).end(done);
+      //checkig the dataabse for thr deleted id
+      Todo.findById(hexId).then((todo)=>{
+        expect(todo).toNotExist;
+        done();
+      }).catch((e)=>{
+        done(e);
+      });
+  });
+
+  test('return id no found if id not present',(done)=>{
+    var hexId = new ObjectID();
+    request(app)
+      .delete(`/todos/${hexId}`)
+      .expect(404)
+      .end(done);
+  });
+//
+//   test('return invalid Id',(done)=>{
+//     request(app)
+//       .delete('todos/asdfg')
+//       .expect(400)
+//       .end(done);
+//   });
+ });
+
+ // describe('PATCH /todos/:id',()=>{
+ //   test('should update todo',(done)=>{
+ //     var hexId = todos[0]._id.toHexString();
+ //     var text = 'this is updated text';
+ //     request(app)
+ //      .patch(`/todo/${hexId}`)
+ //      .send({
+ //        completed:true,
+ //        text
+ //      })
+ //      .expect(200)
+ //      .expect((res)=>{
+ //        expect(res.body.todo.text).toBe(text);
+ //        expect(res.body.todo.completed).toBe(true);
+ //        expect(res.body.todo.completedAt).toBe(number);
+ //      })
+ //      .end(done);
+ //   });
+ // });
