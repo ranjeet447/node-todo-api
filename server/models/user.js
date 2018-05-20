@@ -37,17 +37,17 @@ UserSchema.methods.toJSON = function () {
   var user = this;
   var userObject = user.toObject();
 
-  return _.pick(userObject,['_id','email']);
+  return _.pick(userObject, ['_id', 'email']);
 };
 
 UserSchema.methods.generateAuthToken = function () {
   var user = this;
   var access = 'auth';
-  token = jwt.sign({_id:user._id.toHexString(),access},process.env.JWT_SECRET).toString();
+  var token = jwt.sign({_id: user._id.toHexString(), access}, process.env.JWT_SECRET).toString();
 
-  user.tokens.push({access,token});
+  user.tokens.push({access, token});
 
-  return user.save().then(() =>{
+  return user.save().then(() => {
     return token;
   });
 };
@@ -66,22 +66,18 @@ UserSchema.statics.findByToken = function (token) {
   var User = this;
   var decoded;
 
-  try{
-    decoded = jwt.verify(token,process.env.JWT_SECRET);
-  }catch(e){
-    // return new Promise((resolve,reject)=>{
-    //   reject();
-    // });
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (e) {
     return Promise.reject();
   }
 
   return User.findOne({
-    '_id':decoded._id,
-    'tokens.token':token,
-    'tokens.access':'auth'
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
   });
 };
-
 
 UserSchema.statics.findByCredentials = function (email, password) {
   var User = this;
@@ -104,17 +100,17 @@ UserSchema.statics.findByCredentials = function (email, password) {
   });
 };
 
-//hashing password before saving
-UserSchema.pre('save',function (next) {
-  var user =this;
+UserSchema.pre('save', function (next) {
+  var user = this;
+
   if (user.isModified('password')) {
-    bcrypt.genSalt(10,(err,salt)=>{
-      bcrypt.hash(user.password,salt,(err,hash)=>{
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(user.password, salt, (err, hash) => {
         user.password = hash;
         next();
-      })
-    })
-  }else {
+      });
+    });
+  } else {
     next();
   }
 });
